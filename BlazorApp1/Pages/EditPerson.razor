@@ -1,0 +1,65 @@
+﻿@page "/people/edit/{Id:int}"
+@using BlazorApp1.Models
+@using BlazorApp1.Data
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<CrudContext> DbFactory
+@inject NavigationManager Navigation
+
+<h3>Editar persona</h3>
+
+@if (person == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <EditForm Model="person" OnValidSubmit="Save">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label class="form-label">Cédula</label>
+            <InputText class="form-control" @bind-Value="person.Cedula" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <InputText class="form-control" @bind-Value="person.Nombre" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Apellidos</label>
+            <InputText class="form-control" @bind-Value="person.Apellidos" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Edad</label>
+            <InputNumber class="form-control" @bind-Value="person.Edad" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a class="btn btn-secondary ms-2" href="/people">Cancelar</a>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Person? person;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var ctx = DbFactory.CreateDbContext();
+        person = await ctx.People.FirstOrDefaultAsync(p => p.Id == Id);
+    }
+
+    private async Task Save()
+    {
+        if (person == null) return;
+        using var ctx = DbFactory.CreateDbContext();
+        ctx.People.Update(person);
+        await ctx.SaveChangesAsync();
+        Navigation.NavigateTo("/people");
+    }
+}

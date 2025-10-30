@@ -1,0 +1,61 @@
+﻿@page "/people"
+@using BlazorApp1.Models
+@using BlazorApp1.Data
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<CrudContext> DbFactory
+@inject NavigationManager Navigation
+
+<h3>Personas</h3>
+
+<p>
+    <a class="btn btn-primary" href="/people/create">+ Crear persona</a>
+</p>
+
+@if (people == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else if (!people.Any())
+{
+    <p>No hay personas registradas.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Cédula</th>
+                <th>Nombre</th>
+                <th>Apellidos</th>
+                <th>Edad</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in people)
+            {
+                <tr>
+                    <td>@p.Cedula</td>
+                    <td>@p.Nombre</td>
+                    <td>@p.Apellidos</td>
+                    <td>@p.Edad</td>
+                    <td>
+                        <a class="btn btn-sm btn-info" href="/people/details/@p.Id">Ver</a>
+                        <a class="btn btn-sm btn-warning" href="/people/edit/@p.Id">Editar</a>
+                        <a class="btn btn-sm btn-danger" href="/people/delete/@p.Id">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Person>? people;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var ctx = DbFactory.CreateDbContext();
+        people = await ctx.People.OrderByDescending(p => p.Id).ToListAsync();
+    }
+}
