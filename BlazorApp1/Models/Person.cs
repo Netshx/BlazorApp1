@@ -20,5 +20,14 @@
 
         [Range(0, 150)]
         public int Edad { get; set; }
+
+        [Required]
+        [StringLength(50)]
+        public string Correo { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(50)]
+        public string Observaciones { get; set; } = string.Empty;
+
     }
 }
